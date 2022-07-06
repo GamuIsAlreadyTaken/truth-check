@@ -1,0 +1,5 @@
+{
+  "tasks": {
+    "go": "deno run --watch --allow-all app.ts"
+  }
+}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Truth Check - The role play app</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.ts"></script>
+  <script>
+
+    //Window true size
+    function setDeviceSize() {
+      let vw = window.innerWidth * 0.01;
+      document.documentElement.style.setProperty('--deviceWidth', `${vw}px`);
+      let vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--deviceHeight', `${vh}px`);
+    }
+    setDeviceSize()
+    window.addEventListener('resize', setDeviceSize);
+
+  </script>
+</body>
+
+</html>

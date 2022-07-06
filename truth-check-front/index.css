@@ -1,0 +1,25 @@
+*{
+  box-sizing: border-box;
+}
+body{
+  margin: 0;
+  padding: 1px 0;
+  width: calc(var(--deviceWidth) * 100);
+  height: calc(var(--deviceHeight) * 100);
+  overflow: hidden;
+}
+#app{
+  width: 100%;
+  height: 100%;
+}
+:root {
+  --main-color: #666;
+  --dark-color: #111;
+  --accent-color: #47f;
+
+
+  background-color: var(--dark-color);
+  color: white;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}

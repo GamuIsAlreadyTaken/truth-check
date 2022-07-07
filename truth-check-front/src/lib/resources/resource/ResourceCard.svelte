@@ -1,4 +1,4 @@
-<!-- Crear un store con el modelo del recurso -->
+<!-- Crear un store con el modelo del recurso
 <script lang="ts">
   import AceEditor from 'svelte-ace-editor'
   // const test = {
@@ -42,4 +42,4 @@
   value={text} />
 
 <style>
-</style>
+</style> -->

@@ -5,7 +5,6 @@ export interface ResourceSchema{
   name: string;
   description: string;
   imageURI: string;
-  tags: string[];
   docVersion: number;
   isShared: boolean;
   createdAt?: Date;

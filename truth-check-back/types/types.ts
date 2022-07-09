@@ -10,7 +10,7 @@ export interface Err {
   status: number;
   name: string;
   path: string;
-  param: string;
+  param: unknown;
   message: string;
   type: string;
 }
@@ -58,31 +58,4 @@ export interface UpdateUserStructure {
   isDisabled?: boolean;
   likedResources?: { add?: ForeignKey[]; remove?: ForeignKey[] };
 }
-//#endregion
 
-//#region Resource basics
-interface ResourceStructure {
-  id: string;
-  author: UserStructure | string;
-  name: string;
-  description: string;
-  imageURI: string;
-  tags: string[];
-  createdAt?: Date;
-  updatedAt?: Date;
-  isShared: boolean;
-}
-interface CreateResourceStructure {
-  author: string;
-  name: string;
-  description: string;
-  imageURI: string;
-  tags: string[];
-}
-interface UpdateResourceStructure {
-  name?: string;
-  description?: string;
-  imageURI?: string;
-  tags?: string[];
-  isShared?: boolean;
-}

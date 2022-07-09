@@ -1,12 +1,23 @@
+import db from "../db/db.ts";
 
-export interface ResourceSchema{
+export interface ResourceSchema {
+  //Indexing info
   _id: string;
-  author: string;
+
+  //Maintenance info
+  creationDate: Date;
+  updateDate?: Date;
+  documentVersion: number;
+
+  //Resource info
+  authorId: string;
   name: string;
   description: string;
   imageURI: string;
-  docVersion: number;
-  isShared: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  data: Record<string, Value | Value[]>;
+  isPublic: boolean;
 }
+
+type Value = string | number | boolean;
+
+export const Resource = db.getDatabase.collection<ResourceSchema>("tokens");

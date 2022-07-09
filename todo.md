@@ -1,9 +1,10 @@
 ## To avoid headaches
 - Don't use ids in components
 
-## External libraries
+## TODO
 - Ace editor, for code hightlight
 - GunJs, for sharing games
+- SSL certificates (https://letsencrypt.org/getting-started/) need hosting for this
 
 ## For future Dev
 - Backend on {DenoDeploy} and Frontend on {Vercel} all in a same repo

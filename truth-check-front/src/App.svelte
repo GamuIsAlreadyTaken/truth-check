@@ -1,27 +1,17 @@
 <script lang="ts">
-  import Home from "./pages/Home.svelte";
-  import Playground from "./pages/Playground.svelte";
-  import Workshop from "./pages/Workshop.svelte";
-  import Account from "./pages/Account.svelte";
-  import Marketplace from "./pages/Marketplace.svelte";
+  import { pageControl } from "./pages/pages";
 
-  let selectedRoute = window.location.pathname.split("/")[1];
-  const routes = {
-    play: "playground",
-    create: "workshop",
-    explore: "marketplace",
-    account: "account",
-  };
+  const control = pageControl();
+  const url = window.location.pathname;
+
+  if (control.has(url)) control.go([url]);
+  else control.go(["/home"]);
+
+  $: {
+    if (window.location.pathname != $control[0])
+      window.location.pathname = $control[0];
+    console.log(window.location.pathname);
+  }
 </script>
 
-{#if selectedRoute == routes.play}
-  <Playground />
-{:else if selectedRoute == routes.create}
-  <Workshop />
-{:else if selectedRoute == routes.explore}
-  <Marketplace />
-{:else if selectedRoute == routes.account}
-  <Account />
-{:else}
-  <Home />
-{/if}
+<svelte:component this={$control[1]} />

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Header from "../lib/resources/Header.svelte";
-  import ResourceCard from "../lib/resources/resource/ResourceCard.svelte";
+  import Header from "../lib/components/Header.svelte";
+  import ResourceCard from "../lib/components/resource/ResourceCard.svelte";
 </script>
 
 <svelte:head>

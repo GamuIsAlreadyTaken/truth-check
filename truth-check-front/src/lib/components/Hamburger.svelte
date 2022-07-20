@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Toggle } from "../stores/toggle";
+  import type { Toggle } from "../stores/toggle.store";
   export let controls: Toggle;
 </script>
 

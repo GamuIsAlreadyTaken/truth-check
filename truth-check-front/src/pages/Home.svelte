@@ -1,10 +1,24 @@
+<script lang="ts">
+  import { pageControl } from "./pages";
+  const control = pageControl();
+</script>
+
+<svelte:head>
+  <title>TruthCheck - Home</title>
+</svelte:head>
 
 <div>
   <h2>Truth Check <br /> - <br /> The role play app</h2>
   <div id="controls">
-    <a href="/playground"> Play </a>
-    <a href="/marketplace"> Explore </a>
-    <a href="/workshop"> Create </a>
+    <button id="playground" on:click={control.hook("/playground")}>
+      Play
+    </button>
+    <button id="marketplace" on:click={control.hook("/marketplace")}>
+      Explore
+    </button>
+    <button id="workshop" on:click={control.hook("/workshop")}>
+      Create
+    </button>
   </div>
 </div>
 
@@ -32,7 +46,7 @@
     position: initial;
     transform: initial;
   }
-  a {
+  button {
     --height: 80px;
     --size: 20px;
     position: relative;
@@ -43,6 +57,8 @@
     border: none;
     box-sizing: border-box;
 
+    cursor: pointer;
+
     color: black;
     background-color: white;
     font-size: var(--size);
@@ -51,23 +67,29 @@
     text-align: center;
     padding: calc(var(--height) / 2 - var(--size) / 2);
   }
-  a::after {
-    content: '';
+  button:hover {
+    filter: brightness(0.8);
+  }
+  button:active {
+    filter: invert();
+  }
+  button::after {
+    content: "";
     display: block;
-    width: calc(var(--size)*2);
-    height: calc(var(--size)*2);
+    width: calc(var(--size) * 2);
+    height: calc(var(--size) * 2);
     position: absolute;
     right: var(--size);
     top: calc(var(--height) / 2 - var(--size));
     background-size: contain;
   }
-  a[href="/playground"]::after {
+  #playground::after {
     background-image: url(./src/assets/icons/dice.png);
   }
-  a[href="/marketplace"]::after {
+  #marketplace::after {
     background-image: url(./src/assets/icons/spyglass.png);
   }
-  a[href="/workshop"]::after {
+  #workshop::after {
     background-image: url(./src/assets/icons/quill.png);
   }
 </style>

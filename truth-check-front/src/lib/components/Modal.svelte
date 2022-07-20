@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { toggle } from "../stores/toggle";
+  import { toggle } from "../stores/toggle.store";
   const controls = toggle();
 </script>
 

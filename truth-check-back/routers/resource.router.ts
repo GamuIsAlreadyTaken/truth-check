@@ -1,22 +1,49 @@
-import { Router, RouterContext } from "../deps.ts";
+import { Router } from "../deps.ts";
 import { ResourceController } from "../controllers/resource.controller.ts";
 import { auth } from "../middlewares/auth.middleware.ts";
 import { validate } from "../middlewares/validate.middleware.ts";
-// import { preUploadValidate, upload } from "../deps.ts";
 import {
-  deleteResourceValidation,
-  fetchResourcesValidation,
+  createResourceValidation,
   getResourcesValidation,
   getResourceValidation,
+  updateResourceValidation,
+  deleteResourceValidation,
 } from "../validations/resource.validation.ts";
 
-// deno-lint-ignore no-explicit-any
-const router: any = new Router();
+
+const router = new Router();
 
 router.post(
   "/api/resources",
-  validate(fetchResourcesValidation),
-  ResourceController.fetch,
+  auth(['manageResources']),
+  validate(createResourceValidation),
+  ResourceController.create,
+);
+
+router.get(
+  "/api/resources?id=:id",
+  validate(getResourceValidation),
+  ResourceController.fetchOne,
+);
+
+router.get(
+  "/api/resources",
+  validate(getResourcesValidation),
+  ResourceController.fetchAll,
+);
+
+router.put(
+  "/api/resources?id=:id",
+  auth(['manageResources']),
+  validate(updateResourceValidation),
+  ResourceController.update,
+);
+
+router.delete(
+  "/api/resources?id=:id",
+  auth(['manageResources']),
+  validate(deleteResourceValidation),
+  ResourceController.delete,
 );
 
 export default router;

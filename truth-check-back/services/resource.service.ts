@@ -2,7 +2,7 @@ import { Bson, Status } from "../deps.ts";
 import { renameKey } from '../helpers/type.helper.ts'
 import { throwError } from "../middlewares/errorHandler.middleware.ts";
 import log from "../middlewares/logger.middleware.ts";
-import { Resource, ResourceSchema } from "../models/resource.model.ts";
+import { Resource, DeletedResource, ResourceSchema, UpdatedResource } from "../models/resource.model.ts";
 import type {
   CreateResourceStructure,
   ResourceStructure,
@@ -25,7 +25,7 @@ class ResourceService {
         creationDate,
         documentVersion: 1,
       },
-    ); 
+    );
     if (!resource) {
       throwForNotCompleted('create', { options })
     }
@@ -33,7 +33,7 @@ class ResourceService {
   }
   public static getMany() {
     return Resource.find().map(
-      res => renameKey('_id', 'id', res) //test
+      res => renameKey('_id', 'id', res)
     ) as Promise<ResourceStructure[]>;
   }
   public static async getOne(id: string) {
@@ -43,23 +43,23 @@ class ResourceService {
     if (!resource) {
       return throwForNotCompleted('get', { id })
     }
+
     return renameKey('_id', 'id', resource) as ResourceStructure
   }
   public static async updateOne(
     id: string,
-    state: Record<string, string>,
     options: UpdateResourceStructure,
   ) {
     const resource = await throwIfNotFound(
       'update',
       { _id: id },
-      { id, state, options }
+      { id, options }
     )
 
-    const { documentVersion, name, _id } = resource;
+    const { documentVersion } = resource;
     const newDocVersion = documentVersion + 1;
     const updateDate = new Date();
-    log.debug(`Updating resource ${name} (${_id})`)
+    const movedId = UpdatedResource.insertOne(resource) // test if id is saved
     const result = await Resource.updateOne({ _id: new Bson.ObjectId(id) }, {
       $set: {
         ...options,
@@ -68,38 +68,34 @@ class ResourceService {
       },
     });
     if (!result) {
-      return throwForNotCompleted('update', { id, state, options })
+      return throwForNotCompleted('update', { id, options })
     }
     return result;
   }
-  public static async removeOne(id: string){
+  public static async removeOne(id: string) {
     const resource = await throwIfNotFound(
       'update',
       { _id: id },
       { id }
     )
-    const deleteCount = await Resource.deleteOne({
+    const movedId = await DeletedResource.insertOne(resource) // test if its created with the same id
+    const deleteCount = await Resource.delete({
       _id: new Bson.ObjectId(id),
     });
-    //dont delete it, just move it somewhere
     if (!deleteCount) {
-      return throwError({
-        status: Status.BadRequest,
-        name: "BadRequest",
-        path: "user",
-        param: "user",
-        message: `Could not delete user`,
-        type: "BadRequest",
-      });
+      return throwForNotCompleted('delete', id)
     }
     return deleteCount;
   }
 
 }
+
+
+//Helpers____
 async function throwIfExists(
   action: string,
   search: Partial<ResourceSchema>,
-  param: any) {
+  param: unknown) {
   const resource = await Resource.findOne(search);
   if (resource) {
     log.error("Reosurce already exists");
@@ -116,7 +112,7 @@ async function throwIfExists(
 async function throwIfNotFound(
   action: string,
   search: Partial<ResourceSchema>,
-  param: any) {
+  param: unknown) {
   const resource = await Resource.findOne(search);
   if (!resource) {
     log.error("Resource not found");
@@ -133,7 +129,7 @@ async function throwIfNotFound(
 }
 function throwForNotCompleted(
   action: string,
-  param: any,
+  param: unknown,
 ) {
   log.error(`Resource not be ${action}`);
   throwError({

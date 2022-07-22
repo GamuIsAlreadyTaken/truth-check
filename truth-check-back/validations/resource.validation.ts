@@ -1,20 +1,43 @@
 import { yup } from "../deps.ts";
 
+export const createResourceValidation = {
+  body: yup.object({
+    name: yup.string(),
+    description: yup.string(),
+    imageURI: yup.string(),
+    data: yup.object(),
+    isPublic: yup.boolean()
+  })
+}
+
 export const getResourcesValidation = {};
 
 export const getResourceValidation = {
-  params: yup.object({
+  query: yup.object({
     id: idValidation(),
   }),
 };
 
 export const deleteResourceValidation = {
-  params: yup.object({
+  query: yup.object({
     id: idValidation(),
   }),
 };
 
-export const fetchResourcesValidation = {
+export const updateResourceValidation = {
+  query: yup.object({
+    id: idValidation()
+  }),
+  body: yup.object({
+    name: yup.string().optional(),
+    description: yup.string().optional(),
+    imageURI: yup.string().optional(),
+    data: yup.object().optional(),
+    isPublic: yup.boolean().optional()
+  })
+}
+
+export const getResourcesInBulkValidation = { // TODO: continue with this
   body: yup.object({
     bulk: yup.lazy((val: any) => {
       const obj: any = {};
@@ -25,16 +48,6 @@ export const fetchResourcesValidation = {
     }),
   }),
 };
-
-export function foreignKeyValidation(collection: string[]) {
-  return yup.object({
-    referencedCollection: yup.string().required().oneOf(
-      collection,
-      `foreign key must reference one of ${collection}`,
-    ),
-    referencedResource: idValidation(),
-  });
-}
 
 export function idValidation() {
   return yup.string().trim().length(24).required();

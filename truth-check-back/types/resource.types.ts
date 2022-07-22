@@ -15,7 +15,7 @@ export interface ResourceStructure{
   isPublic: boolean;
 }
 export interface CreateResourceStructure{
-  authorId: string;
+  authorId: string;  // is it really necesary
   name: string;
   description: string;
   imageURI: string;

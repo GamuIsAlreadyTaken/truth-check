@@ -27,9 +27,7 @@ export const pageControl = () => ({
 type url = string
 type component = typeof SvelteComponentDev
 
-type Page = [
-  url, component
-]
+type Page = [url, component]
 
 
 // Add all pages referenced in pages/index to the controls
@@ -41,6 +39,6 @@ for (const importedPage of Object.values(importedPages)) {
     importedPage
   ]);
 }
-function buildUrlFromImport(importedPage){
+  function buildUrlFromImport(importedPage: {name: string}){
   return `/${importedPage.name.match(/<(.+?)>/)[1].toLowerCase()}`
 }

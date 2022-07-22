@@ -20,4 +20,9 @@ export interface ResourceSchema {
 
 type Value = string | number | boolean;
 
-export const Resource = db.getDatabase.collection<ResourceSchema>("tokens");
+export const DeletedResource =
+  db.getDatabase.collection<ResourceSchema>("deletedResources")
+export const UpdatedResource =
+  db.getDatabase.collection<ResourceSchema>("updatedResources")
+export const Resource =
+  db.getDatabase.collection<ResourceSchema>("resources");

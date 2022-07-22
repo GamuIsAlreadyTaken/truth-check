@@ -1,11 +1,10 @@
 import { roleRights } from "../config/roles.ts";
-import { Context, Status } from "../deps.ts";
+import { Context, Status, RouterMiddleware } from "../deps.ts";
 import type { RouterContext } from "../deps.ts";
 import JwtHelper from "../helpers/jwt.helper.ts";
 import UserService from "../services/user.service.ts";
-import type { UserStructure } from "../types/types.interface.ts";
+import type { UserStructure } from "../types/types.ts";
 import { throwError } from "./errorHandler.middleware.ts";
-import log from "../middlewares/logger.middleware.ts";
 
 /**
  * Check user Rights
@@ -36,13 +35,13 @@ const checkRights = (
   return true;
 };
 
-export const auth = (requiredRights: string[]) =>
+export const auth = <T extends string>(requiredRights: string[]): RouterMiddleware<T> =>
   async (
-    ctx: RouterContext<string>,
+    context: RouterContext<T>,
     next: () => Promise<unknown>,
   ) => {
     let JWT: string;
-    const jwt: string = ctx.request.headers.get("Authorization") ?? ''
+    const jwt: string = context.request.headers.get("Authorization") ?? ''
     if (!(jwt && jwt.includes("Bearer"))) {
       throwError({
         status: Status.Unauthorized,
@@ -68,20 +67,20 @@ export const auth = (requiredRights: string[]) =>
     }
     const user: UserStructure | Error = await UserService.getOne(data.id);
     if (user && checkRights(requiredRights, user as UserStructure)) {
-      ctx.state = user;
+      context.state = user;
     }
 
     await next();
   };
 
-  export const pageAuth = async (ctx: Context)=>{
-    const jwt: string = ctx.request.headers.get("Authorization") ?? ''
-    if (!(jwt && jwt.includes("Bearer"))) {
-      return false
-    }
-    const JWT = jwt.split("Bearer ")[1];
-    try{
-      var data: any | Error = await JwtHelper.getJwtPayload(JWT);
-    }catch{}
-    return !!data
-  }
+  // export const pageAuth = async (ctx: Context)=>{
+  //   const jwt: string = ctx.request.headers.get("Authorization") ?? ''
+  //   if (!(jwt && jwt.includes("Bearer"))) {
+  //     return false
+  //   }
+  //   const JWT = jwt.split("Bearer ")[1];
+  //   try{
+  //     var data: any | Error = await JwtHelper.getJwtPayload(JWT);
+  //   }catch{}
+  //   return !!data
+  // }

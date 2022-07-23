@@ -21,7 +21,7 @@ router.post(
 );
 
 router.get(
-  "/api/resources?id=:id",
+  "/api/resources/:id",
   validate(getResourceValidation),
   ResourceController.fetchOne,
 );
@@ -33,14 +33,14 @@ router.get(
 );
 
 router.put(
-  "/api/resources?id=:id",
+  "/api/resources/:id",
   auth(['manageResources']),
   validate(updateResourceValidation),
   ResourceController.update,
 );
 
 router.delete(
-  "/api/resources?id=:id",
+  "/api/resources/:id",
   auth(['manageResources']),
   validate(deleteResourceValidation),
   ResourceController.delete,

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "truth-check": "file:truth-check-front"
+  }
+}

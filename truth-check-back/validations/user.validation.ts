@@ -1,5 +1,5 @@
 import { yup } from "../deps.ts";
-import { foreignKeyValidation, idValidation } from "./resource.validation.ts";
+import { idValidation } from "./resource.validation.ts";
 
 export const createUserValidation = {
   body: yup.object({
@@ -50,11 +50,11 @@ export const updateMeValidation = {
       .object({
         add: yup
           .array(
-            foreignKeyValidation(["actors", "effects", "items", "stages"]),
+            idValidation(),
           ),
         remove: yup
           .array(
-            foreignKeyValidation(["actors", "effects", "items", "stages"]),
+            idValidation(),
           ),
       }),
   }),
@@ -75,11 +75,11 @@ export const updateUserValidation = {
       .object({
         add: yup
           .array(
-            foreignKeyValidation(["actors", "effects", "items", "stages"]),
+            idValidation(),
           ),
         remove: yup
           .array(
-            foreignKeyValidation(["actors", "effects", "items", "stages"]),
+            idValidation(),
           ),
       }),
   }),

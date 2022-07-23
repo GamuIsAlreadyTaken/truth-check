@@ -1,6 +1,7 @@
 
 import { RouterContext, Status } from "../deps.ts";
 import ResourceService from "../services/resource.service.ts";
+import {log} from '../middlewares/logger.middleware.ts'
 class ResourceController {
   public static async fetchOne(
     { request, response, state }: RouterContext<string>
@@ -36,7 +37,7 @@ class ResourceController {
       data,
       isPublic,
     } = await body.value
-
+    log.debug()
     if ([name, description, imageURI, data, isPublic].some(e => !e))
       return response.status = Status.BadRequest
 

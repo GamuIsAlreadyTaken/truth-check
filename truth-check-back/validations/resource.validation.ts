@@ -13,19 +13,19 @@ export const createResourceValidation = {
 export const getResourcesValidation = {};
 
 export const getResourceValidation = {
-  query: yup.object({
+  param: yup.object({
     id: idValidation(),
   }),
 };
 
 export const deleteResourceValidation = {
-  query: yup.object({
+  param: yup.object({
     id: idValidation(),
   }),
 };
 
 export const updateResourceValidation = {
-  query: yup.object({
+  param: yup.object({
     id: idValidation()
   }),
   body: yup.object({

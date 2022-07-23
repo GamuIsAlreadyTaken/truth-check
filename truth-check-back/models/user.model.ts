@@ -1,5 +1,5 @@
 import db from "../db/db.ts";
-import { ForeignKey } from "../types/types.interface.ts";
+import { ForeignKey } from "../types/types.ts";
 
 
 export interface UserSchema {

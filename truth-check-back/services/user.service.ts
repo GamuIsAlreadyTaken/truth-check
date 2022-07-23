@@ -8,7 +8,7 @@ import type {
   UpdatedStructure,
   UpdateUserStructure,
   UserStructure,
-} from "../types/types.interface.ts";
+} from "../types/types.ts";
 import { roleRights } from "../config/roles.ts";
 
 class UserService {

@@ -17,6 +17,7 @@ class ResourceService {
       authorId,
       name,
     } = options;
+    log.debug('Creating resource')
     await throwIfExists('create', { authorId, name }, { options })
     const creationDate = new Date();
     const resource = await Resource.insertOne(

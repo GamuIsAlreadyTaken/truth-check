@@ -3,7 +3,7 @@ import { Bson, Status } from "../deps.ts";
 import JwtHelper from "../helpers/jwt.helper.ts";
 import { throwError } from "../middlewares/errorHandler.middleware.ts";
 import { Token, TokenSchema } from "../models/token.model.ts";
-import type { TokenStructure } from "../types/types.interface.ts";
+import type { TokenStructure } from "../types/types.ts";
 
 class TokenService {
   /**

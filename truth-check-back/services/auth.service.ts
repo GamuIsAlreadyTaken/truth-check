@@ -7,10 +7,10 @@ import type {
   LoginStructure,
   TokenStructure,
   UserStructure,
-} from "../types/types.interface.ts";
+} from "../types/types.ts";
 import TokenService from "./token.service.ts";
 import UserService from "./user.service.ts";
-import log from "../middlewares/logger.middleware.ts";
+
 
 class AuthService {
   /**

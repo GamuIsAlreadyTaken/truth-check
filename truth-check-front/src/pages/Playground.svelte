@@ -17,7 +17,7 @@
 
 {#await getResource()}
   ...Loading
-{:then {data}}
+{:then data}
   <ResourceCard resource={data} />
 {/await}
 

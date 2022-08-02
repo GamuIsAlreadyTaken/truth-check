@@ -1,39 +1,43 @@
 <script lang="ts">
   import ColapsableBlock from "./ColapsableBlock.svelte";
-
-  export let data;
+  export let data: Record<string, any>;
+  export let images: string[] = [];
 
   let entries = Object.entries(data);
-
-  const MAX_LENGTH = 40;
 </script>
 
-<div>
-  {#each entries as [key, value]}
-    {#if typeof value == "object"}
-      <ColapsableBlock>
-        <svelte:fragment slot="label">{key}:</svelte:fragment>
-        <svelte:self data={value} slot="content" />
-      </ColapsableBlock>
-    {:else if typeof value == "string" && value.length > MAX_LENGTH}
-      <ColapsableBlock>
-        <svelte:fragment slot="label">{key}:</svelte:fragment>
-        <svelte:fragment slot="content">{value}</svelte:fragment>
-      </ColapsableBlock>
-    {:else}
-      <p>
-        {key}: {value}
-      </p>
-    {/if}
-  {/each}
-</div>
+{#each entries as [key, value]}
+  <ColapsableBlock label={key.startsWith("$") ? key.split("$").pop() : key}>
+    <!-- Remove $ from start -->
+    <svelte:fragment slot="content">
+      {#if typeof value === "object"}
+        <svelte:self data={value} />
+      {:else if images.includes(key)}
+        <img src={value} alt="" />
+      {:else if key.startsWith("$")}
+        <div class="CODE_EDITOR">
+          {value}
+        </div>
+      {:else}
+        {value}
+      {/if}
+    </svelte:fragment>
+  </ColapsableBlock>
+{/each}
 
+<!-- 
+  Make simple blocks not have the arrow
+  Change ellipsis blocks to remove ellipsis instead of show duplicate
+  Make images show directly and remove arrow
+
+ -->
 <style>
-  div {
-    margin: 0 20px;
+  img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
   }
-  p {
-    margin: 5px 0;
-    border: 1px solid #555;
+  .CODE_EDITOR {
+    background-color: #555;
   }
 </style>

@@ -1,4 +1,5 @@
-const TYPES = [
+export {}
+/*const TYPES = [
   'actor',
   'item',
   'stage',
@@ -37,3 +38,4 @@ export type {
   Value,
   Type
 }
+*/

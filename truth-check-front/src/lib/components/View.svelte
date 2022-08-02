@@ -7,8 +7,8 @@
 </script>
 
 {#each entries as [key, value]}
+  <!-- Remove $ from start -->
   <ColapsableBlock label={key.startsWith("$") ? key.split("$").pop() : key}>
-    <!-- Remove $ from start -->
     <svelte:fragment slot="content">
       {#if typeof value === "object"}
         <svelte:self data={value} />

@@ -3,12 +3,12 @@
     
     "complexArray": [
       {
-        "foreignId": "123123123123123123123",
+        "foreignId": "primera id 1",
         "documentVersion": 1
       },
       {
-        "foreignId": "123123123123123123123",
-        "documentVersion": 1
+        "foreignId": "segunda id 2",
+        "documentVersion": 2
       }
     ]
   }

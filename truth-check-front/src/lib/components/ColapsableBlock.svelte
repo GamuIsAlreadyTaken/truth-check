@@ -1,42 +1,26 @@
 <script lang="ts">
   export let label: string;
   console.log("type of label:", typeof label, label);
-  let oppened: boolean;
+  let oppened: boolean = true;
+
+  const onlyContent = !isNaN(parseInt(label));
 </script>
 
-<label class:oppened>
-  <input type="checkbox" bind:checked={oppened} />
-
-  {#if isNaN(parseInt(label))}
-    <p>{label}</p>
+{#if onlyContent}
+  <slot name="content" />
+{:else}
+  <label class:oppened>
+    <input type="checkbox" bind:checked={oppened} style:display="none" />
+    {#if !onlyContent}
+      <p>{label}</p>
+    {/if}
     <div class:oppened>
       <slot name="content" />
     </div>
-  {:else}
-    <p>{label}</p>
-
-    <!-- Think of a way to avoid index labels while having 
-      posibility to show resources 
-      arrays should show directly the elements without indexes
-      think of something to put when the content is not a simple string
-      for example think of inventory, an array of resources
-      
-    -->
-    <div class="content">
-      <slot name="content" />
-    </div>
-  {/if}
-</label>
+  </label>
+{/if}
 
 <style>
-  .content {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  input {
-    display: none;
-  }
   p {
     margin: 5px 80px 0 0;
     text-overflow: ellipsis;
@@ -50,6 +34,7 @@
     --icon-color: red;
 
     border: 1px solid white;
+    padding: 0 100px 0 0;
   }
   label::before {
     content: "";
@@ -69,18 +54,23 @@
     transform: translateY(-50%) rotateZ(45deg) scaleY(-1) scaleX(-1);
     top: var(--size);
   }
-
   div {
-    display: flex;
-    flex-direction: column;
-    transition: translateY 200ms ease;
+    /* display: flex;
+    flex-direction: column; */
+    transition: translate 200ms ease;
     transform-origin: top;
-    transform: translateY(100%) scaleY(0);
+    transform: translateY(100%);
     height: 0;
     margin: 0;
   }
   div.oppened {
-    transform: translateY(0) scaleY(1);
+    transform: translateY(0);
     height: auto;
   }
+  /* .content {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: auto;
+  } */
 </style>

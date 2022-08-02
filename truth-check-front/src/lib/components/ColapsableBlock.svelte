@@ -1,20 +1,22 @@
 <script lang="ts">
   export let label: string;
   console.log("type of label:", typeof label, label);
-  let oppened: boolean = true;
+  let oppened: boolean;
 
   const onlyContent = !isNaN(parseInt(label));
 </script>
 
 {#if onlyContent}
-  <slot name="content" />
+  <div>
+    <slot name="content" />
+  </div>
 {:else}
   <label class:oppened>
     <input type="checkbox" bind:checked={oppened} style:display="none" />
     {#if !onlyContent}
       <p>{label}</p>
     {/if}
-    <div class:oppened>
+    <div class:oppened class="content">
       <slot name="content" />
     </div>
   </label>
@@ -31,10 +33,9 @@
     position: relative;
     margin: 0;
     --size: 15px;
-    --icon-color: red;
+    --icon-color: #000;
 
     border: 1px solid white;
-    padding: 0 100px 0 0;
   }
   label::before {
     content: "";
@@ -42,35 +43,29 @@
     position: absolute;
     right: calc(var(--size) * 3);
     top: 50%;
-    transform: translateY(-50%) rotateZ(45deg);
-    background-color: var(--icon-color);
-    transform-origin: center;
-    transition: transform 150ms ease, top 150ms ease;
+    transform: translateY(-50%);
+
     width: var(--size);
     height: var(--size);
-    border-radius: 0 0 0 0;
+
+    background-color: var(--icon-color);
+    clip-path: polygon(100% 20%, 0 20%, 50% 100%);
   }
   label.oppened::before {
-    transform: translateY(-50%) rotateZ(45deg) scaleY(-1) scaleX(-1);
+    transform: translateY(-50%) scaleY(-1);
     top: var(--size);
   }
-  div {
-    /* display: flex;
-    flex-direction: column; */
+  .content {
+    display: flex;
+    flex-direction: column;
     transition: translate 200ms ease;
     transform-origin: top;
-    transform: translateY(100%);
+    transform: translateY(0) scaleY(0);
     height: 0;
     margin: 0;
   }
-  div.oppened {
-    transform: translateY(0);
+  .content.oppened {
+    transform: scaleY(1);
     height: auto;
   }
-  /* .content {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    height: auto;
-  } */
 </style>

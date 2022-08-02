@@ -3,6 +3,8 @@
   export let data: Record<string, any>;
   export let images: string[] = [];
 
+
+  console.log(images)
   let entries = Object.entries(data);
 </script>
 

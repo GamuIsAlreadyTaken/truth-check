@@ -21,10 +21,16 @@ router.post(
 );
 
 router.get(
-  "/api/resources/:id",
+  "/api/resources/:id/:version",
   validate(getResourceValidation),
   ResourceController.fetchOne,
 );
+
+router.get(
+  '/api/resources/bulk/:id/:version',
+  validate(getResourceValidation),
+  ResourceController.fetchChain
+)
 
 router.get(
   "/api/resources",

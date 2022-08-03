@@ -1,5 +1,6 @@
-type Value = string | number | boolean;
-export interface ResourceStructure{
+import { Value } from "./types.ts";
+
+export interface ResourceStructure {
   //Indexing info
   id: string;
   //Maintenance info
@@ -14,7 +15,7 @@ export interface ResourceStructure{
   data: Record<string, Value | Value[]>;
   isPublic: boolean;
 }
-export interface CreateResourceStructure{
+export interface CreateResourceStructure {
   authorId: string;  // is it really necesary
   name: string;
   description: string;
@@ -22,7 +23,7 @@ export interface CreateResourceStructure{
   data: Record<string, Value | Value[]>;
   isPublic: boolean;
 }
-export interface UpdateResourceStructure{
+export interface UpdateResourceStructure {
   name?: string;
   description?: string;
   imageURI?: string;

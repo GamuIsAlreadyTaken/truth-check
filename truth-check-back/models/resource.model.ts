@@ -1,4 +1,5 @@
 import db from "../db/db.ts";
+import { Value } from "../types/types.ts";
 
 export interface ResourceSchema {
   //Indexing info
@@ -18,7 +19,6 @@ export interface ResourceSchema {
   isPublic: boolean;
 }
 
-type Value = string | number | boolean;
 
 export const DeletedResource =
   db.getDatabase.collection<ResourceSchema>("deletedResources")

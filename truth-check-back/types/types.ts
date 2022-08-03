@@ -15,9 +15,11 @@ export interface Err {
   type: string;
 }
 export interface ForeignKey {
-  referencedCollection: string;
-  referencedResource: string;
+  foreignId: string;
+  documentVersion: string;
 }
+export type Value = string | number | boolean | ForeignKey;
+
 //#endregion
 
 //#region Auth types

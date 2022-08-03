@@ -37,12 +37,12 @@ class ResourceService {
       res => renameKey('_id', 'id', res)
     ) as Promise<ResourceStructure[]>;
   }
-  public static async getOne(id: string) {
+  public static async getOne(id: string, version: number) {
     const resource = await Resource.findOne(
-      { _id: new Bson.ObjectId(id) },
+      { _id: new Bson.ObjectId(id), documentVersion: version },
     );
     if (!resource) {
-      return throwForNotCompleted('get', { id })
+      return throwForNotCompleted('get', { id, version })
     }
 
     return renameKey('_id', 'id', resource) as ResourceStructure

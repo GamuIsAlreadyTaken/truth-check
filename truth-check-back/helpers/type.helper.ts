@@ -15,3 +15,6 @@ export const renameKey = <
     ...({ [newKey]: value } as Record<NewKey, T[OldKey]>)
   }
 }
+
+export type Only<obj, key extends keyof obj> = Omit<obj, Exclude<keyof obj, key>>
+export type AtLeast<obj, key extends keyof obj> = Partial<obj> & Pick<obj, key>

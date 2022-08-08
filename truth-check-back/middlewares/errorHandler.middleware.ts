@@ -6,7 +6,7 @@ import type { Err } from "../types/types.ts";
  * @param options
  * @throws Error Throws Error
  */
-export const throwError = (options: Err): Error => {
+export const throwError = (options: Err) => {
   throw options;
 };
 
@@ -17,8 +17,7 @@ export const throwError = (options: Err): Error => {
  * @returns Promise<void>
  */
 export const errorHandler = async (
-  // deno-lint-ignore no-explicit-any
-  ctx: Context<State, Record<string, any>>,
+  ctx: Context<State, Record<string, unknown>>,
   next: () => Promise<unknown>,
 ): Promise<void> => {
   try {

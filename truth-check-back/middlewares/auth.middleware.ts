@@ -1,5 +1,5 @@
 import { roleRights } from "../config/roles.ts";
-import { Context, Status, RouterMiddleware } from "../deps.ts";
+import { Status, RouterMiddleware } from "../deps.ts";
 import type { RouterContext } from "../deps.ts";
 import JwtHelper from "../helpers/jwt.helper.ts";
 import UserService from "../services/user.service.ts";
@@ -40,7 +40,6 @@ export const auth = <T extends string>(requiredRights: string[]): RouterMiddlewa
     context: RouterContext<T>,
     next: () => Promise<unknown>,
   ) => {
-    let JWT: string;
     const jwt: string = context.request.headers.get("Authorization") ?? ''
     if (!(jwt && jwt.includes("Bearer"))) {
       throwError({
@@ -52,9 +51,8 @@ export const auth = <T extends string>(requiredRights: string[]): RouterMiddlewa
         type: "Unauthorized",
       });
     }
-    JWT = jwt.split("Bearer ")[1];
-    // deno-lint-ignore no-explicit-any
-    const data: any | Error = await JwtHelper.getJwtPayload(JWT);
+    const JWT = jwt.split("Bearer ")[1];
+    const data = await JwtHelper.getJwtPayload(JWT);
     if (!data) {
       throwError({
         status: Status.Unauthorized,
@@ -65,7 +63,7 @@ export const auth = <T extends string>(requiredRights: string[]): RouterMiddlewa
         type: "Unauthorized",
       });
     }
-    const user: UserStructure | Error = await UserService.getOne(data.id);
+    const user: UserStructure | Error = await UserService.getOne(data.id as string);
     if (user && checkRights(requiredRights, user as UserStructure)) {
       context.state = user;
     }

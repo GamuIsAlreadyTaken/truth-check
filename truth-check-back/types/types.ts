@@ -16,7 +16,10 @@ export interface Err {
 }
 export interface ForeignKey {
   foreignId: string;
-  documentVersion: string;
+  documentVersion: string; //TEST.documentVersion: number
+}
+export interface FailedReference extends ForeignKey {
+  error: string;
 }
 export type Value = string | number | boolean | ForeignKey;
 

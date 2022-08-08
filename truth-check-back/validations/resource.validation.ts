@@ -10,22 +10,27 @@ export const createResourceValidation = {
   })
 }
 
-export const getResourcesValidation = {};
+export const getResourcesValidation = {
+  queries: yup.object({
+    lastDate: yup.date().optional()
+  })
+};
 
 export const getResourceValidation = {
-  param: yup.object({
+  params: yup.object({
     id: idValidation(),
+    version: yup.number().optional()
   }),
 };
 
 export const deleteResourceValidation = {
-  param: yup.object({
+  params: yup.object({
     id: idValidation(),
   }),
 };
 
 export const updateResourceValidation = {
-  param: yup.object({
+  params: yup.object({
     id: idValidation()
   }),
   body: yup.object({
@@ -36,18 +41,6 @@ export const updateResourceValidation = {
     isPublic: yup.boolean().optional()
   })
 }
-
-export const getResourcesInBulkValidation = { // TODO: continue with this
-  body: yup.object({
-    bulk: yup.lazy((val: any) => {
-      const obj: any = {};
-      for (const key in val) {
-        obj[key] = yup.array(idValidation());
-      }
-      return yup.object(obj);
-    }),
-  }),
-};
 
 export function idValidation() {
   return yup.string().trim().length(24).required();

@@ -16,6 +16,7 @@ class AuthController {
     const { email, password } = await body.value;
     log.debug("Trying Login user");
     response.body = await AuthService.login({ email, password });
+
   }
 
   /**

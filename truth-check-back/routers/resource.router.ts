@@ -1,4 +1,4 @@
-import { Router } from "../deps.ts";
+import { Router, RouterMiddleware } from "../deps.ts";
 import { ResourceController } from "../controllers/resource.controller.ts";
 import { auth } from "../middlewares/auth.middleware.ts";
 import { validate } from "../middlewares/validate.middleware.ts";
@@ -22,18 +22,34 @@ router.post(
 
 router.get(
   "/api/resources/:id/:version",
+  auth([]),
+  validate(getResourceValidation),
+  ResourceController.fetchOne,
+);
+router.get(
+  "/api/resources/:id",
+  auth([]),
   validate(getResourceValidation),
   ResourceController.fetchOne,
 );
 
 router.get(
   '/api/resources/bulk/:id/:version',
+  auth([]),
+  validate(getResourceValidation),
+  ResourceController.fetchChain
+)
+
+router.get(
+  '/api/resources/bulk/:id',
+  auth([]),
   validate(getResourceValidation),
   ResourceController.fetchChain
 )
 
 router.get(
   "/api/resources",
+  auth([]),
   validate(getResourcesValidation),
   ResourceController.fetchAll,
 );

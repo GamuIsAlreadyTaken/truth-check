@@ -3,6 +3,7 @@ import { errorHandler } from "./middlewares/errorHandler.middleware.ts";
 import log from "./middlewares/logger.middleware.ts";
 import configs from "./config/config.ts";
 import router from "./routers/index.ts";
+import { atp } from "./middlewares/atp.middleware.ts";
 
 const { env, url, port, clientUrl } = configs;
 
@@ -17,25 +18,15 @@ const corsOptions = {
 };
 
 // app.use(oakCors(corsOptions));
-// app.use(errorHandler);
+app.use(errorHandler)
+app.use(atp)
+router.init(app)
 
-router.init(app);
 
 // app.addEventListener("listen", () => {
 //   log.info(`Current Environment: ${env}`);
 //   log.info(`Server listening at ${url}`);
 // });
-import { User, UserSchema } from "./models/user.model.ts";
-
-User.insertOne({
-  name: 'test',
-  docVersion: 1,
-  email: 'tets',
-  isDisabled: false,
-  likedResources: [],
-  password: '1234',
-  role: 'user',
-})
 
 if (import.meta.main) {
   await app.listen({ port });

@@ -40,7 +40,6 @@ class AuthService {
       }: UserSchema = user;
       const tokens: TokenStructure | Error = await TokenService
         .generateAuthTokensService(_id.toString());
-      console.log("Come in :)");
       return ({
         tokens,
         user: {

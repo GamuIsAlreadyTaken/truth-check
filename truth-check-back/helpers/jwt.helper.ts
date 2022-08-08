@@ -39,7 +39,7 @@ class JwtHelper {
    * @param token
    * @returns Promise<Payload | Error> Returns JWT payload
    */
-  public static async getJwtPayload(token: string): Promise<Payload | Error> {
+  public static async getJwtPayload(token: string): Promise<Payload> {
     try {
       return await verify(token, key);
     } catch (_e) {

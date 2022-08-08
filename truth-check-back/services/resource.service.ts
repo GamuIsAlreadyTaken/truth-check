@@ -8,6 +8,7 @@ import type {
   ResourceStructure,
   UpdateResourceStructure
 } from "../types/resource.types.ts";
+import { FailedReference } from "../types/types.ts";
 
 class ResourceService {
   public static async createOne(
@@ -32,30 +33,53 @@ class ResourceService {
     }
     return resource;
   }
-  public static getMany() {
-    return Resource.find().map(
-      res => renameKey('_id', 'id', res)
-    ) as Promise<ResourceStructure[]>;
+  public static getMany(lastDate = new Date()) {
+    const MAX_RESOURCES_PER_CALL = 1
+    return Resource.find({ creationDate: { $lt: lastDate } })
+      .sort({ creationDate: -1 })
+      .limit(MAX_RESOURCES_PER_CALL)
+      .map(
+        res => renameKey('_id', 'id', res)
+      ) as Promise<ResourceStructure[]>;
   }
-  public static async getOne(id: string, version: number) {
-    const resource = await Resource.findOne(
-      { _id: new Bson.ObjectId(id), documentVersion: version },
-    );
-    if (!resource) {
-      return throwForNotCompleted('get', { id, version })
+  // TEST.getMany
+  /*
+    1. without lastDate
+    2. with a lastDate greater than the max
+    3. with a lastDate lower than the min
+    4. make test remember the last date and modify maxResources to 1 and see if its secuencial
+    5. make call, add resources, make call
+  */
+  public static async getOne(id: string, version?: number) {
+    const filter: {_id: Bson.ObjectId, documentVersion?: number} = { _id: new Bson.ObjectId(id) }
+    if (version) {
+      filter.documentVersion = version
     }
-
+    
+    const resource =
+    await Resource.findOne(filter)
+    || await UpdatedResource.findOne(filter)
+    || await DeletedResource.findOne(filter)
+    
+    if (!resource) return throwIfNotFound('get', { _id: id, documentVersion: version }, { id, version })
+    
     return renameKey('_id', 'id', resource) as ResourceStructure
   }
+  // TEST. getOne
+  /*
+    1. with version
+    2. without version
+    3. with fake id
+  */
   public static async updateOne(
     id: string,
     options: UpdateResourceStructure,
   ) {
-    const resource = await throwIfNotFound(
-      'update',
-      { _id: id },
-      { id, options }
-    )
+    const filter = { _id: new Bson.ObjectId(id) }
+    const resource = await Resource.findOne(filter)
+    if (!resource) {
+      return throwIfNotFound('update', { _id: id }, { id, options })
+    }
 
     const { documentVersion } = resource;
     const newDocVersion = documentVersion + 1;
@@ -68,25 +92,23 @@ class ResourceService {
         updateDate
       },
     });
-    if (!result) {
-      return throwForNotCompleted('update', { id, options })
-    }
+
     return result;
   }
   public static async removeOne(id: string) {
-    const resource = await throwIfNotFound(
-      'update',
-      { _id: id },
-      { id }
-    )
-    const movedId = await DeletedResource.insertOne(resource) // test if its created with the same id
+    const filter = { _id: new Bson.ObjectId(id) }
+    const resource = await Resource.findOne(filter)
+    if (!resource) {
+      return throwIfNotFound('update', { _id: id }, { id })
+    }
+
+    const movedId = await DeletedResource.insertOne(resource) // TEST if its created with the same id
+    log.debug(`Test if deleted elements are move with the same id,\n originalID: ${id} == newID: ${movedId}`)
     const deleteCount = await Resource.delete({
       _id: new Bson.ObjectId(id),
     });
-    if (!deleteCount) {
-      return throwForNotCompleted('delete', id)
-    }
-    return deleteCount;
+
+    return new Number(deleteCount);
   }
 
 }
@@ -110,23 +132,24 @@ async function throwIfExists(
     });
   }
 }
-async function throwIfNotFound(
+function throwIfNotFound(
   action: string,
-  search: Partial<ResourceSchema>,
+  search: Required<Pick<ResourceSchema, '_id'>> & Partial<ResourceSchema>,
   param: unknown) {
-  const resource = await Resource.findOne(search);
-  if (!resource) {
-    log.error("Resource not found");
-    throwError({
-      status: Status.NotFound,
-      name: "NotFound",
-      path: `Resource.${action}`,
-      param,
-      message: `Resource not found`,
-      type: "NotFound",
-    });
-  }
-  return resource as ResourceSchema
+  log.error("Resource not found");
+  throwError({
+    status: Status.NotFound,
+    name: "NotFound",
+    path: `Resource.${action}`,
+    param,
+    message: `Resource not found`,
+    type: "NotFound",
+  });
+  return {
+    foreignId: search._id,
+    documentVersion: search.documentVersion || 'Latest',
+    error: 'Not Found'
+  } as FailedReference
 }
 function throwForNotCompleted(
   action: string,

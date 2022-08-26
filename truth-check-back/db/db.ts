@@ -39,6 +39,7 @@ class Database {
   }
 }
 
+
 const db = new Database(dbName, mongoUrl);
 await db.connect();
 

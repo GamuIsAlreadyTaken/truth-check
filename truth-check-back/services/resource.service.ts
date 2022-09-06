@@ -14,6 +14,9 @@ import type {
   UpdateResourceStructure,
 } from "../types/resource.types.ts";
 import { FailedReference } from "../types/types.ts";
+import config from '../config/config.ts'
+
+const { maxItemsPerResponse } = config
 
 class ResourceService {
   public static async createOne(
@@ -23,8 +26,7 @@ class ResourceService {
       authorId,
       name,
     } = options;
-    log.debug("Creating resource");
-    await throwIfExists("create", { authorId, name }, { options });
+    await throwIfExists('create', { authorId, name }, { options })
     const creationDate = new Date();
     const resource = await Resource.insertOne(
       {
@@ -42,7 +44,7 @@ class ResourceService {
     const MAX_RESOURCES_PER_CALL = 1;
     return Resource.find({ creationDate: { $lt: lastDate } })
       .sort({ creationDate: -1 })
-      .limit(MAX_RESOURCES_PER_CALL)
+      .limit(maxItemsPerResponse)
       .map(
         (res) => renameKey("_id", "id", res),
       ) as Promise<ResourceStructure[]>;
@@ -63,15 +65,14 @@ class ResourceService {
       filter.documentVersion = version;
     }
 
-    const resource = await Resource.findOne(filter) ||
-      await UpdatedResource.findOne(filter) ||
-      await DeletedResource.findOne(filter);
+    const resource =
+      await Resource.findOne(filter)
+      || await UpdatedResource.findOne(filter)
+      || await DeletedResource.findOne(filter)
 
-    if (!resource) {
-      return createFailedReference({ _id: id, documentVersion: version });
-    }
+    if (!resource) return throwIfNotFound('get', { _id: id, documentVersion: version }, { id, version })
 
-    return renameKey("_id", "id", resource) as ResourceStructure;
+    return renameKey('_id', 'id', resource) as ResourceStructure
   }
   // TEST. getOne
   /*

@@ -1,12 +1,17 @@
 import { Bson, Status } from "../deps.ts";
-import { renameKey } from '../helpers/type.helper.ts'
+import { renameKey } from "../helpers/type.helper.ts";
 import { throwError } from "../middlewares/errorHandler.middleware.ts";
 import log from "../middlewares/logger.middleware.ts";
-import { Resource, DeletedResource, ResourceSchema, UpdatedResource } from "../models/resource.model.ts";
+import {
+  DeletedResource,
+  Resource,
+  ResourceSchema,
+  UpdatedResource,
+} from "../models/resource.model.ts";
 import type {
   CreateResourceStructure,
   ResourceStructure,
-  UpdateResourceStructure
+  UpdateResourceStructure,
 } from "../types/resource.types.ts";
 import { FailedReference } from "../types/types.ts";
 
@@ -18,8 +23,8 @@ class ResourceService {
       authorId,
       name,
     } = options;
-    log.debug('Creating resource')
-    await throwIfExists('create', { authorId, name }, { options })
+    log.debug("Creating resource");
+    await throwIfExists("create", { authorId, name }, { options });
     const creationDate = new Date();
     const resource = await Resource.insertOne(
       {
@@ -29,17 +34,17 @@ class ResourceService {
       },
     );
     if (!resource) {
-      throwForNotCompleted('create', { options })
+      throwForNotCompleted("create", { options });
     }
     return resource;
   }
   public static getMany(lastDate = new Date()) {
-    const MAX_RESOURCES_PER_CALL = 1
+    const MAX_RESOURCES_PER_CALL = 1;
     return Resource.find({ creationDate: { $lt: lastDate } })
       .sort({ creationDate: -1 })
       .limit(MAX_RESOURCES_PER_CALL)
       .map(
-        res => renameKey('_id', 'id', res)
+        (res) => renameKey("_id", "id", res),
       ) as Promise<ResourceStructure[]>;
   }
   // TEST.getMany
@@ -51,19 +56,22 @@ class ResourceService {
     5. make call, add resources, make call
   */
   public static async getOne(id: string, version?: number) {
-    const filter: {_id: Bson.ObjectId, documentVersion?: number} = { _id: new Bson.ObjectId(id) }
+    const filter: { _id: Bson.ObjectId; documentVersion?: number } = {
+      _id: new Bson.ObjectId(id),
+    };
     if (version) {
-      filter.documentVersion = version
+      filter.documentVersion = version;
     }
-    
-    const resource =
-    await Resource.findOne(filter)
-    || await UpdatedResource.findOne(filter)
-    || await DeletedResource.findOne(filter)
-    
-    if (!resource) return throwIfNotFound('get', { _id: id, documentVersion: version }, { id, version })
-    
-    return renameKey('_id', 'id', resource) as ResourceStructure
+
+    const resource = await Resource.findOne(filter) ||
+      await UpdatedResource.findOne(filter) ||
+      await DeletedResource.findOne(filter);
+
+    if (!resource) {
+      return createFailedReference({ _id: id, documentVersion: version });
+    }
+
+    return renameKey("_id", "id", resource) as ResourceStructure;
   }
   // TEST. getOne
   /*
@@ -72,53 +80,54 @@ class ResourceService {
     3. with fake id
   */
   public static async updateOne(
-    id: string,
+    _id: string,
     options: UpdateResourceStructure,
   ) {
-    const filter = { _id: new Bson.ObjectId(id) }
-    const resource = await Resource.findOne(filter)
-    if (!resource) {
-      return throwIfNotFound('update', { _id: id }, { id, options })
-    }
+    const filter = { _id };
+    const resource = await Resource.findOne(filter);
+    if (!resource) return createFailedReference({ _id });
 
     const { documentVersion } = resource;
     const newDocVersion = documentVersion + 1;
     const updateDate = new Date();
-    const movedId = UpdatedResource.insertOne(resource) // test if id is saved
-    const result = await Resource.updateOne({ _id: new Bson.ObjectId(id) }, {
+    const movedId = UpdatedResource.insertOne(resource); // TEST if id is saved
+    log.debug(
+      `Test if updated elements are move with the same id,\n originalID: ${_id} == newID: ${movedId}`,
+    );
+
+    const result = await Resource.updateOne({ _id }, {
       $set: {
         ...options,
         documentVersion: newDocVersion,
-        updateDate
+        updateDate,
       },
     });
 
-    return result;
+    return new Number(result.modifiedCount);
   }
-  public static async removeOne(id: string) {
-    const filter = { _id: new Bson.ObjectId(id) }
-    const resource = await Resource.findOne(filter)
-    if (!resource) {
-      return throwIfNotFound('update', { _id: id }, { id })
-    }
+  public static async removeOne(_id: string) {
+    const filter = { _id };
 
-    const movedId = await DeletedResource.insertOne(resource) // TEST if its created with the same id
-    log.debug(`Test if deleted elements are move with the same id,\n originalID: ${id} == newID: ${movedId}`)
-    const deleteCount = await Resource.delete({
-      _id: new Bson.ObjectId(id),
-    });
+    const resource = await Resource.findOne(filter);
+    if (!resource) return createFailedReference(filter);
 
-    return new Number(deleteCount);
+    const movedId = await DeletedResource.insertOne(resource); // TEST if its created with the same id
+    log.debug(
+      `Test if deleted elements are move with the same id,\n originalID: ${_id} == newID: ${movedId}`,
+    );
+
+    const deleteCount = await Resource.delete({ _id });
+
+    return new Number(deleteCount)
   }
-
 }
-
 
 //Helpers____
 async function throwIfExists(
   action: string,
   search: Partial<ResourceSchema>,
-  param: unknown) {
+  param: unknown,
+) {
   const resource = await Resource.findOne(search);
   if (resource) {
     log.error("Reosurce already exists");
@@ -132,24 +141,15 @@ async function throwIfExists(
     });
   }
 }
-function throwIfNotFound(
-  action: string,
-  search: Required<Pick<ResourceSchema, '_id'>> & Partial<ResourceSchema>,
-  param: unknown) {
+function createFailedReference(
+  search: Required<Pick<ResourceSchema, "_id">> & Partial<ResourceSchema>,
+) {
   log.error("Resource not found");
-  throwError({
-    status: Status.NotFound,
-    name: "NotFound",
-    path: `Resource.${action}`,
-    param,
-    message: `Resource not found`,
-    type: "NotFound",
-  });
   return {
     foreignId: search._id,
-    documentVersion: search.documentVersion || 'Latest',
-    error: 'Not Found'
-  } as FailedReference
+    documentVersion: search.documentVersion || "Latest",
+    error: "Not Found",
+  } as FailedReference;
 }
 function throwForNotCompleted(
   action: string,

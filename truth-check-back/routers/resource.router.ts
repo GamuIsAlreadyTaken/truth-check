@@ -9,6 +9,7 @@ import {
   updateResourceValidation,
   deleteResourceValidation,
 } from "../validations/resource.validation.ts";
+import loggerMiddleware from "../middlewares/logger.middleware.ts";
 
 
 const router = new Router();

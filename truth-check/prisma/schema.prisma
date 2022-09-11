@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int        @id @default(autoincrement())
+  lastUpdate       DateTime   @updatedAt
+  creationDate     DateTime   @default(now())
+  // Data
+  name             String
+  email            String //Private
+  password         String //Private
+  salt             String //Private
+  // Resources are created by users
+  createdResources Resource[] @relation("author")
+  // Users can like resources to follow them
+  likedResource    Resource[] @relation("like")
+}
+
+model Resource {
+  id                 Int                @id @default(autoincrement())
+  creationDate       DateTime           @default(now())
+  // Resources are created by users 
+  author             User               @relation("author", fields: [authorID], references: [id], onDelete: Cascade)
+  authorID           Int
+  // Users can like resources to follow them
+  userWhoLiked       User[]             @relation("like")
+  // Resources are version controlled
+  versions           Resource_version[] @relation("version")
+  hasVisibleVersions Boolean            @default(true) // To speed up searching for visible resources
+}
+
+model Resource_version {
+  version    Int      @default(1)
+  resource   Resource @relation("version", fields: [resourceId], references: [id], onDelete: Cascade)
+  resourceId Int
+
+  updatedAt   DateTime @default(now())
+  isVisible   Boolean  @default(true)
+  // Data
+  name        String
+  description String
+  imageURI    String
+  data        Json
+
+  @@id([version, resourceId])
+}
+
+// Wanted behabiour: 
+// # User on User
+// - Users can be created freely  -> Users do not depend on other models
+// - Users can modify themselves  -> Users do not have versions
+// # User on Resource             
+// - Users can create resources   -> A resource depends on a user existing
+// - Users can modify their own resources, this creates a new version -> 
+// ## Visibility
+// - Resource versions can be visible or not visible
+// - Resources are visible if any of its versions is visible
+// - Users can see all visible resources and its visible versions
+// - Users cannot see not visible resources
+// - Users can see all their created resources and versions of them
+// - Users can see any user and all its visible created resources and visible versions 
+
+// IDEA User account deletion and recovery: 
+// Users mail field its private
+// Users can delete its account, this removes the password from the DB and locks the account
+// For recovery a user must introduce its mail, if its the same as the one saved on its account a mail will be sent to it
+// when a recovery link is used, the user is asked to create a new password ant thus the account is recovered

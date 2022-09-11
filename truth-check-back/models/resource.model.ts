@@ -9,6 +9,7 @@ export interface ResourceSchema {
   creationDate: Date;
   updateDate?: Date;
   documentVersion: number;
+  isPublic: boolean;
 
   //Resource info
   authorId: string;
@@ -16,7 +17,6 @@ export interface ResourceSchema {
   description: string;
   imageURI: string;
   data: Record<string, Value | Value[]>;
-  isPublic: boolean;
 }
 
 

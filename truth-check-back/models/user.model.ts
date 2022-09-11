@@ -9,8 +9,9 @@ export interface UserSchema {
   password: string;
   role: string;
   likedResources: ForeignKey[];
-  docVersion: number;
+  
   isDisabled: boolean;
+  docVersion: number;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -9,8 +9,8 @@ datasource db {
 
 model User {
   id               Int        @id @default(autoincrement())
-  lastUpdate       DateTime   @updatedAt
-  creationDate     DateTime   @default(now())
+  lastUpdate       Int? //update time
+  creationDate     Int //creation time
   // Data
   name             String
   email            String //Private
@@ -24,7 +24,7 @@ model User {
 
 model Resource {
   id                 Int                @id @default(autoincrement())
-  creationDate       DateTime           @default(now())
+  creationDate       Int //Creation time
   // Resources are created by users 
   author             User               @relation("author", fields: [authorID], references: [id], onDelete: Cascade)
   authorID           Int
@@ -40,8 +40,8 @@ model Resource_version {
   resource   Resource @relation("version", fields: [resourceId], references: [id], onDelete: Cascade)
   resourceId Int
 
-  updatedAt   DateTime @default(now())
-  isVisible   Boolean  @default(true)
+  updatedAt   Int //Creation time
+  isVisible   Boolean @default(true)
   // Data
   name        String
   description String

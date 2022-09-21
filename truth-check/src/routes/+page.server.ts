@@ -14,7 +14,8 @@ const user: Prisma.UserCreateInput = {
   name: 'TestUser Name',
   email: 'TestUser Email',
   password: 'TestUser Password',//Should be salted and hashed
-  salt: 'TestUser Salt'
+  salt: 'TestUser Salt',
+  creationDate: Date.now()
 }
 
 

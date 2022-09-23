@@ -11,6 +11,7 @@ model User {
   id               Int        @id @default(autoincrement())
   lastUpdate       Int? //update time
   creationDate     Int //creation time
+  disabled         Boolean    @default(false)
   // Data
   name             String
   email            String //Private

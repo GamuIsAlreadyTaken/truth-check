@@ -1,4 +1,4 @@
-import { prisma } from '$lib/database/database'
+import { dbClient } from '$lib/database/database'
 import { Prisma } from '@prisma/client'
 import { json } from '@sveltejs/kit'
 
@@ -9,7 +9,6 @@ import { json } from '@sveltejs/kit'
   Delete user
   Get    user
 */
-
 const user: Prisma.UserCreateInput = {
   name: 'TestUser Name',
   email: 'TestUser Email',
@@ -35,15 +34,16 @@ const user: Prisma.UserCreateInput = {
 //   }
 // })
 // console.log(updatedUser)
-// // console.log('Deleting user')
-// // const deletedUser = await prisma.user.delete({
-// //   where: {
-// //     id: createdUser.id
-// //   }
-// // })
-// // console.log(deletedUser)
+// console.log('Deleting user')
+// const deletedUser = await prisma.user.delete({
+//   where: {
+//     id: createdUser.id
+//   }
+// })
+// console.log(deletedUser)
+
 console.log('Finding user')
-const foundUser = await prisma.user.findFirst({
+const foundUser = await dbClient.user.findFirst({
   where: {
     name: 'TestUser Name'
   },
@@ -73,6 +73,10 @@ const foundUser = await prisma.user.findFirst({
 })
 console.log(foundUser)
 
+export function load(){
+  return foundUser
+}
+
 
 // TEST Resoruce
 /*
@@ -81,7 +85,7 @@ console.log(foundUser)
   Delete user
   Get    user
 */
-
+/*
 const resource: Prisma.ResourceCreateInput = {
   versions: {
     create: {
@@ -186,6 +190,7 @@ console.log(giveLike)
 await prisma.$disconnect()
 
 export function load() {
-  console.log(foundUser) // TODO Find a way to deal with devalu not parsing Dtae objects 😠
+  console.log(foundUser) // TODO Find a way to deal with deval not parsing Date objects 😠
   return foundUser
 }
+*/

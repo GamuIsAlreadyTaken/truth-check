@@ -8,22 +8,22 @@ datasource db {
 }
 
 model User {
-  id               Int        @id @default(autoincrement())
+  id               Int         @id @default(autoincrement())
   lastUpdate       Int? //update time
   creationDate     Int //creation time
-  disabled         Boolean    @default(false)
+  disabled         Boolean     @default(false)
   // Data
   name             String
   email            String //Private
   password         String //Private
   salt             String //Private
   // Resources are created by users
-  createdResources Resource[] @relation("author")
+  createdResources Resource_[] @relation("author")
   // Users can like resources to follow them
-  likedResource    Resource[] @relation("like")
+  likedResource    Resource_[] @relation("like")
 }
 
-model Resource {
+model Resource_ {
   id                 Int                @id @default(autoincrement())
   creationDate       Int //Creation time
   // Resources are created by users 
@@ -37,8 +37,8 @@ model Resource {
 }
 
 model Resource_version {
-  version    Int      @default(1)
-  resource   Resource @relation("version", fields: [resourceId], references: [id], onDelete: Cascade)
+  version    Int       @default(1)
+  resource   Resource_ @relation("version", fields: [resourceId], references: [id], onDelete: Cascade)
   resourceId Int
 
   updatedAt   Int //Creation time

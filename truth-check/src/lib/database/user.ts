@@ -24,10 +24,10 @@ import { saltHash } from "$lib/cripto/cripto.util";
 // add createdResource, param resource: Resource
 // like likedResource, param resource: Resource
 // dislike likedResource, param resource: Resource
-type UserId = Pick<User, "id">;
+type UserCreateInput = Pick<DB.UserCreateInput, 'name' | 'email' | 'password'>
 
 export const UserController = {
-  async create({ name, email, password }: DB.UserCreateInput) {
+  async create({ name, email, password }: UserCreateInput) {
     let { salt, hashedPassword } = await saltHash(password);
     return dbClient.user.create({
       data: {
@@ -39,7 +39,7 @@ export const UserController = {
       },
     });
   },
-  get({ id }: UserId) {
+  get(id: User['id']) {
     return dbClient.user.findUnique({
       where: {
         id,
@@ -58,7 +58,7 @@ export const UserController = {
       },
     });
   },
-  delete({ id }: UserId) {
+  delete(id: User['id'] ) {
     return dbClient.user.update({
       where: {
         id,

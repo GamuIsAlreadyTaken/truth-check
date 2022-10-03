@@ -44,10 +44,10 @@ model Resource_version {
   updatedAt   Int //Creation time
   isVisible   Boolean @default(true)
   // Data
-  name        String
-  description String
-  imageURI    String
-  data        Json
+  name        String?
+  description String?
+  imageURI    String?
+  data        Json?
 
   @@id([version, resourceId])
 }

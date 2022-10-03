@@ -1,6 +1,7 @@
 import { genSalt, hash } from "bcrypt";
+export { hash };
 
-const saltRounds = 10;
+export const saltRounds = 10;
 
 export async function saltHash(password: string) {
   let salt = await genSalt(saltRounds);

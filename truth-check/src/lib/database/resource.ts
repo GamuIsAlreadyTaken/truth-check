@@ -37,37 +37,6 @@ model Resource_version {
 type Resource = Resource_ & {
   versions: Omit<Resource_version, "resourceId">[];
 };
-
-let a: Resource = {
-  id: 0,
-  authorID: 0,
-  creationDate: 0,
-  hasVisibleVersions: false,
-  versions: [
-    {
-      version: 0,
-      data: {}, //
-      description: "", //
-      imageURI: "", //
-      isVisible: false, //
-      name: "", //
-      updatedAt: 0,
-    },
-  ],
-};
-
-let b: Resource_version = {
-  data: {},
-  description: "",
-  imageURI: "",
-  isVisible: true,
-  name: "",
-
-  resourceId: 0,
-  updatedAt: 0,
-  version: 0,
-};
-
 const versionMask = {
   data: true,
   description: true,
@@ -133,8 +102,8 @@ export const ResourceController = {
     return foundResources;
   },
   /**By id */
-  async getOne(id: Resource["id"], version: Resource_version["version"]) {
-    let foundResource = await dbClient.resource_.findUnique({
+  getOne(id: Resource["id"], version: Resource_version["version"]) {
+    return dbClient.resource_.findUnique({
       where: {
         id,
       },
@@ -147,40 +116,88 @@ export const ResourceController = {
         },
       },
     });
-    return foundResource;
   },
-  async update(id: Resource["id"], resource: Partial<ResourceInput>) { // TODO figure out if passing a null value deletes it
+  async update(id: Resource["id"], resource: Partial<ResourceInput>) {
     let numberOfVersions = await dbClient.resource_version.count({
       where: {
-        resourceId: id
-      }
-    })
+        resourceId: id,
+      },
+    });
 
     let updatedResource = await dbClient.resource_.update({
       where: {
-        id
+        id,
       },
       data: {
         versions: {
-
           create: {
-            version: numberOfVersions, // TODO keep with this, update the resource
-            /*
-              TODO decide if when the name is updated the hole version is duplicated, or if 
-              only name is saved with the rest of the fields with undefined, then, when searching for a version 
-              it will be constructed as the layers in paint.net
-            */
-            description: '',
-            name: '',
-            data: {},
-            imageURI: '',
+            version: numberOfVersions,
             updatedAt: Date.now(),
             isVisible: true,
-          }
-        }
-      }
-    }) 
+            ...resource,
+          },
+        },
+      },
+    });
+    return updatedResource
   },
-  delete() {
+  async deleteLastVersion(id: Resource["id"]) {
+    // marcar la ultima version como no visible
+    let versionCount = await dbClient.resource_version.count({
+      where: {
+        resourceId: id,
+      },
+    });
+    let updatedVersion = await dbClient.resource_version.update({
+      where: {
+        version_resourceId: {
+          resourceId: id,
+          version: versionCount - 1,
+        },
+      },
+      data: {
+        isVisible: false,
+      },
+    });
+    this.checkVisibility(id);
+    return updatedVersion;
+  },
+  async deleteVersion(
+    id: Resource["id"],
+    version: Resource_version["version"],
+  ) {
+    // marcar la version indicada como no visible
+    let updatedVersion = dbClient.resource_version.update({
+      where: {
+        version_resourceId: {
+          resourceId: id,
+          version,
+        },
+      },
+      data: {
+        isVisible: false,
+      },
+    });
+    this.checkVisibility(id);
+    return updatedVersion;
+  },
+  async checkVisibility(id: Resource["id"]) {
+    // Mantiene actualizada hasVisibleVersions
+    let visibleVersions = await dbClient.resource_version.count({
+      where: {
+        AND: {
+          resourceId: id,
+          isVisible: true,
+        },
+      },
+    });
+    dbClient.resource_.update({
+      where: {
+        id,
+      },
+      data: {
+        hasVisibleVersions: visibleVersions != 0,
+      },
+    });
   },
 };

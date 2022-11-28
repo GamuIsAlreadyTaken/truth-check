@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-export type { Resource_, Resource_version, User } from "@prisma/client";
+export type { Resource_, Resource_version, User, Token } from "@prisma/client";
 
 export const dbClient = new PrismaClient();
 export { Prisma as DB };

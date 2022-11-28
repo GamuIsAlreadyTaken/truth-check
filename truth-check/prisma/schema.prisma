@@ -21,6 +21,7 @@ model User {
   createdResources Resource_[] @relation("author")
   // Users can like resources to follow them
   likedResource    Resource_[] @relation("like")
+  Token            Token[]
 }
 
 model Resource_ {
@@ -72,3 +73,15 @@ model Resource_version {
 // Users can delete its account, this removes the password from the DB and locks the account
 // For recovery a user must introduce its mail, if its the same as the one saved on its account a mail will be sent to it
 // when a recovery link is used, the user is asked to create a new password ant thus the account is recovered
+
+model Token {
+  date DateTime @default(now()) @updatedAt
+  hasExpired Boolean @default(true)
+  key  String
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @id
+}
+// Behabiour: 
+// User logs in, a row is created and a new key is created, user uses the new key for auth
+// On key expiration  
